@@ -24,7 +24,7 @@ export class Note {
     appendCardsToDeck(deck: Deck): void {
         for (const question of this.questionList) {
             for (const card of question.cards) {
-                deck.appendCard(question.topicPath, card);
+                deck.appendCard(question.topicPaths, card);
             }
         }
     }

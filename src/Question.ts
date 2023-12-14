@@ -205,10 +205,6 @@ export class Question {
         const hasEditLaterTag = originalText.includes(settings.editLaterTag);
         const questionText: QuestionText = QuestionText.create(originalText, settings);
 
-        noteTopicPaths.forEach((topicPath) => {
-            console.log(topicPath.path);
-        });
-
         let topicPaths: TopicPath[] = noteTopicPaths;
         if (questionText.topicPaths.some((t) => t.hasPath)) {
             topicPaths = questionText.topicPaths;

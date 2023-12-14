@@ -72,9 +72,14 @@ export class Deck {
         return this._getOrCreateDeck(topicPath, false);
     }
 
-    getOrCreateDeck(topicPath: TopicPath): Deck {
-        return this._getOrCreateDeck(topicPath, true);
+    getDecks(topicPaths: TopicPath[]): Deck[] {
+        return this._getOrCreateDecks(topicPaths, false);
     }
+
+    getOrCreateDecks(topicPaths: TopicPath[]): Deck[] {
+        return this._getOrCreateDecks(topicPaths, true);
+    }
+
 
     private _getOrCreateDeck(topicPath: TopicPath, createAllowed: boolean): Deck {
         if (!topicPath.hasPath) {
@@ -95,6 +100,15 @@ export class Deck {
             result = subdeck._getOrCreateDeck(t, createAllowed);
         }
         return result;
+    }
+
+    private _getOrCreateDecks(topicPaths: TopicPath[], createAllowed: boolean): Deck[] {
+        let decks : Deck[] = [];
+        topicPaths.forEach((topicPath) => {
+            const deck = this._getOrCreateDeck(topicPath, createAllowed);
+            if (deck != this) decks.push(deck);
+        });
+        return decks;
     }
 
     getTopicPath(): TopicPath {
@@ -126,11 +140,12 @@ export class Deck {
         return cardListType == CardListType.DueCard ? this.dueFlashcards : this.newFlashcards;
     }
 
-    appendCard(topicPath: TopicPath, cardObj: Card): void {
-        const deck: Deck = this.getOrCreateDeck(topicPath);
-        const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
-
-        cardList.push(cardObj);
+    appendCard(topicPaths: TopicPath[], cardObj: Card): void {
+        const decks: Deck[] = this.getOrCreateDecks(topicPaths);
+        decks.forEach((deck) => {
+            const cardList: Card[] = deck.getCardListForCardType(cardObj.cardListType);
+            cardList.push(cardObj);
+        });
     }
 
     deleteCard(card: Card): void {
