@@ -37,7 +37,7 @@ export class QuestionText {
     original: string;
 
     // The question topic path (only present if topic path included in original text)
-    topicPath: TopicPath;
+    topicPaths: TopicPath[];
 
     // The white space after the topic path, before the actualQuestion
     // We keep this so that when a question is updated, we can retain the original spacing
@@ -52,12 +52,12 @@ export class QuestionText {
 
     constructor(
         original: string,
-        topicPath: TopicPath,
+        topicPaths: TopicPath[],
         postTopicPathWhiteSpace: string,
         actualQuestion: string,
     ) {
         this.original = original;
-        this.topicPath = topicPath;
+        this.topicPaths = topicPaths;
         this.postTopicPathWhiteSpace = postTopicPathWhiteSpace;
         this.actualQuestion = actualQuestion;
         this.textHash = cyrb53(this.formatForNote());
@@ -68,20 +68,23 @@ export class QuestionText {
     }
 
     static create(original: string, settings: SRSettings): QuestionText {
-        const [topicPath, postTopicPathWhiteSpace, actualQuestion] = this.splitText(
+        const [topicPaths, postTopicPathWhiteSpace, actualQuestion] = this.splitText(
             original,
             settings,
         );
 
-        return new QuestionText(original, topicPath, postTopicPathWhiteSpace, actualQuestion);
+        return new QuestionText(original, topicPaths, postTopicPathWhiteSpace, actualQuestion);
     }
 
-    static splitText(original: string, settings: SRSettings): [TopicPath, string, string] {
+    static splitText(original: string, settings: SRSettings): [TopicPath[], string, string] {
         const strippedSR = NoteCardScheduleParser.removeCardScheduleInfo(original).trim();
         let actualQuestion: string = strippedSR;
         let whiteSpace: string = "";
 
         let topicPath: TopicPath = TopicPath.emptyPath;
+
+
+
         if (!settings.convertFoldersToDecks) {
             const t = TopicPath.getTopicPathFromCardText(strippedSR);
             if (t?.hasPath) {
@@ -108,7 +111,7 @@ export class QuestionText {
 export class Question {
     note: Note;
     questionType: CardType;
-    topicPath: TopicPath;
+    topicPaths: TopicPath[];
     questionText: QuestionText;
     lineNo: number;
     hasEditLaterTag: boolean;
@@ -194,7 +197,7 @@ export class Question {
     static Create(
         settings: SRSettings,
         questionType: CardType,
-        noteTopicPath: TopicPath,
+        noteTopicPaths: TopicPath[],
         originalText: string,
         lineNo: number,
         context: string[],
@@ -202,14 +205,18 @@ export class Question {
         const hasEditLaterTag = originalText.includes(settings.editLaterTag);
         const questionText: QuestionText = QuestionText.create(originalText, settings);
 
-        let topicPath: TopicPath = noteTopicPath;
+        noteTopicPaths.forEach((topicPath) => {
+            console.log(topicPath.path);
+        });
+
+        let topicPaths: TopicPath[] = noteTopicPaths;
         if (questionText.topicPath.hasPath) {
-            topicPath = questionText.topicPath;
+            topicPaths = questionText.topicPath;
         }
 
         const result: Question = new Question({
             questionType,
-            topicPath,
+            topicPaths,
             questionText,
             lineNo,
             hasEditLaterTag,
