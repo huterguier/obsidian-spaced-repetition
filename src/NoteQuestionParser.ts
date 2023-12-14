@@ -22,7 +22,7 @@ export class ParsedQuestionInfo {
 export class NoteQuestionParser {
     settings: SRSettings;
     noteFile: ISRFile;
-    noteTopicPath: TopicPath;
+    noteTopicPaths: TopicPath[];
     noteText: string;
 
     constructor(settings: SRSettings) {
@@ -32,20 +32,20 @@ export class NoteQuestionParser {
     async createQuestionList(noteFile: ISRFile, folderTopicPath: TopicPath): Promise<Question[]> {
         this.noteFile = noteFile;
         const noteText: string = await noteFile.read();
-        let noteTopicPath: TopicPath;
+        let noteTopicPaths: TopicPath[];
         if (this.settings.convertFoldersToDecks) {
-            noteTopicPath = folderTopicPath;
+            noteTopicPaths = [folderTopicPath]
         } else {
             const tagList: string[] = noteFile.getAllTags();
-            noteTopicPath = this.determineTopicPathFromTags(tagList);
+            noteTopicPaths = this.determineTopicPathsFromTags(tagList);
         }
-        const result: Question[] = this.doCreateQuestionList(noteText, noteTopicPath);
+        const result: Question[] = this.doCreateQuestionList(noteText, noteTopicPaths);
         return result;
     }
 
-    private doCreateQuestionList(noteText: string, noteTopicPath: TopicPath): Question[] {
+    private doCreateQuestionList(noteText: string, noteTopicPaths: TopicPath[]): Question[] {
         this.noteText = noteText;
-        this.noteTopicPath = noteTopicPath;
+        this.noteTopicPaths = noteTopicPaths;
 
         const result: Question[] = [];
         const parsedQuestionInfoList: [CardType, string, number][] = this.parseQuestions();
@@ -101,7 +101,7 @@ export class NoteQuestionParser {
         const result = Question.Create(
             this.settings,
             cardType,
-            this.noteTopicPath,
+            this.noteTopicPaths,
             cardText,
             lineNo,
             questionContext,
@@ -135,15 +135,17 @@ export class NoteQuestionParser {
         return siblings;
     }
 
-    private determineTopicPathFromTags(tagList: string[]): TopicPath {
-        let result: TopicPath = TopicPath.emptyPath;
+    private determineTopicPathsFromTags(tagList: string[]): TopicPath[] {
+        let result: TopicPath[] = [];
         outer: for (const tagToReview of this.settings.flashcardTags) {
             for (const tag of tagList) {
                 if (tag === tagToReview || tag.startsWith(tagToReview + "/")) {
-                    result = TopicPath.getTopicPathFromTag(tag);
-                    break outer;
+                    result.push(TopicPath.getTopicPathFromTag(tag));
                 }
             }
+        }
+        if (result.length === 0) {
+            result = [TopicPath.emptyPath];
         }
         return result;
     }

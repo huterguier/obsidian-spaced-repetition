@@ -17,7 +17,7 @@ export enum CardType {
 
 //
 // QuestionText comprises the following components:
-//      1. QuestionTopicPath (optional)
+//      1. QuestionTopicPaths (optional)
 //      2. Actual question text (mandatory)
 //      3. Card schedule info as HTML comment (optional)
 //
@@ -94,12 +94,12 @@ export class QuestionText {
             }
         }
 
-        return [topicPath, whiteSpace, actualQuestion];
+        return [[topicPath], whiteSpace, actualQuestion];
     }
 
     formatForNote(): string {
         let result: string = "";
-        if (this.topicPath.hasPath) {
+        if (this.topicPaths.some((t) => t.hasPath)) {
             result += this.topicPath.formatAsTag();
             result += this.postTopicPathWhiteSpace ?? " ";
         }
@@ -210,8 +210,8 @@ export class Question {
         });
 
         let topicPaths: TopicPath[] = noteTopicPaths;
-        if (questionText.topicPath.hasPath) {
-            topicPaths = questionText.topicPath;
+        if (questionText.topicPaths.some((t) => t.hasPath)) {
+            topicPaths = questionText.topicPaths;
         }
 
         const result: Question = new Question({
