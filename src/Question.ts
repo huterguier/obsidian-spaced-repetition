@@ -100,7 +100,7 @@ export class QuestionText {
     formatForNote(): string {
         let result: string = "";
         if (this.topicPaths.some((t) => t.hasPath)) {
-            result += this.topicPath.formatAsTag();
+            result += this.topicPaths.find((t) => (t.hasPath)).formatAsTag();
             result += this.postTopicPathWhiteSpace ?? " ";
         }
         result += this.actualQuestion;

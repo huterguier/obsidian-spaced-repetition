@@ -44,11 +44,11 @@ A::B
         let expected = [
             {
                 questionType: CardType.SingleLineBasic,
-                topicPath: TopicPath.emptyPath,
+                topicPaths: [TopicPath.emptyPath],
                 questionText: {
                     original: `A::B`,
                     actualQuestion: "A::B",
-                    topicPath: TopicPath.emptyPath,
+                    topicPath: [TopicPath.emptyPath],
                 },
 
                 lineNo: 1,

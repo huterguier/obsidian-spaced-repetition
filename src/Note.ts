@@ -33,7 +33,7 @@ export class Note {
         let str: string = `Note: ${desc}: ${this.questionList.length} questions\r\n`;
         for (let i = 0; i < this.questionList.length; i++) {
             const q: Question = this.questionList[i];
-            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPath?.path}: ${q.questionText.original}\r\n`;
+            str += `[${i}]: ${q.questionType}: ${q.lineNo}: ${q.topicPaths.map((tp) => tp.path).join(", ")}: ${q.questionText.original}\r\n`;
         }
         console.debug(str);
     }

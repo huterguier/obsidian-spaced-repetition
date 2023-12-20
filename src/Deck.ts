@@ -76,6 +76,10 @@ export class Deck {
         return this._getOrCreateDecks(topicPaths, false);
     }
 
+    getOrCreateDeck(topicPath: TopicPath): Deck {
+        return this._getOrCreateDeck(topicPath, true);
+    }
+
     getOrCreateDecks(topicPaths: TopicPath[]): Deck[] {
         return this._getOrCreateDecks(topicPaths, true);
     }
@@ -152,6 +156,11 @@ export class Deck {
         const cardList: Card[] = this.getCardListForCardType(card.cardListType);
         const idx = cardList.indexOf(card);
         if (idx != -1) cardList.splice(idx, 1);
+    }
+
+    deleteCardAtDecks(topicPaths: TopicPath[], card: Card): void {
+        const decks: Deck[] = this.getDecks(topicPaths);
+        decks.forEach((deck) => deck.deleteCard(card));
     }
 
     deleteCardAtIndex(index: number, cardListType: CardListType): void {
