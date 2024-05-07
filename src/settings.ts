@@ -130,19 +130,17 @@ export class SRSettingTab extends PluginSettingTab {
 
         containerEl.createEl("h3", { text: `${t("FLASHCARDS")}` });
 
-        new Setting(containerEl)
+        var flashcarSetting = new Setting(containerEl)
             .setName(t("FLASHCARD_TAGS"))
             .setDesc(t("FLASHCARD_TAGS_DESC"))
-            .addTextArea((text) =>
-                text
-                    .setValue(this.plugin.data.settings.flashcardTags.join(" "))
-                    .onChange((value) => {
-                        applySettingsUpdate(async () => {
-                            this.plugin.data.settings.flashcardTags = value.split(/\s+/);
-                            await this.plugin.savePluginData();
-                        });
-                    }),
-            );
+        
+        var controlEl = flashcarSetting.controlEl.createDiv({text: t("FLASHCARD_TAGS_DESC")})
+            //create a html elemtent with the tags rendered as links to the tag
+            //e.g. <a href="#uni/pt/2" class="tag" target="_blank" rel="noopener">#uni/pt/2</a>
+        controlEl.innerHTML = this.plugin.data.settings.flashcardTags.map(tag => {
+            return `<a href="#${tag}" class="tag" rel="noopener">${tag}</a>`
+        }).join(" ");
+        
 
         new Setting(containerEl)
             .setName(t("CONVERT_FOLDERS_TO_DECKS"))
